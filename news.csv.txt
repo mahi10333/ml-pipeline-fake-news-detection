@@ -1,0 +1,7 @@
+text,label
+"Government passes new law",REAL
+"Aliens landed in Delhi yesterday",FAKE
+"Stock market hits record high",REAL
+"Celebrity is a robot",FAKE
+"New education policy announced",REAL
+"Time traveler spotted in Mumbai",FAKE

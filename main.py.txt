@@ -1,0 +1,65 @@
+import os
+import pickle
+import string
+
+# Install required libraries in Programiz (if needed)
+# Some Programiz environments already have these
+try:
+    import pandas as pd
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.linear_model import LogisticRegression
+except:
+    print("Required libraries not available in this environment.")
+    exit()
+
+# Simple text cleaning (no nltk to avoid errors)
+def clean_text(text):
+    text = text.lower()
+    text = "".join([char for char in text if char not in string.punctuation])
+    return text
+
+# Training function
+def train_model():
+    data = {
+        "text": [
+            "Government passes new law",
+            "Aliens landed in Delhi yesterday",
+            "Stock market hits record high",
+            "Celebrity is a robot",
+            "New education policy announced",
+            "Time traveler spotted in Mumbai"
+        ],
+        "label": ["REAL", "FAKE", "REAL", "FAKE", "REAL", "FAKE"]
+    }
+
+    df = pd.DataFrame(data)
+
+    df["text"] = df["text"].apply(clean_text)
+
+    tfidf = TfidfVectorizer()
+    X = tfidf.fit_transform(df["text"])
+    y = df["label"]
+
+    model = LogisticRegression()
+    model.fit(X, y)
+
+    return model, tfidf
+
+# Prediction function
+def predict_news(text, model, tfidf):
+    text = clean_text(text)
+    X = tfidf.transform([text])
+    return model.predict(X)[0]
+
+# MAIN PROGRAM
+print("Fake News Detector")
+print("-------------------")
+
+# Train model (no file saving to avoid Programiz errors)
+model, tfidf = train_model()
+
+news = input("Enter news text: ")
+
+result = predict_news(news, model, tfidf)
+
+print("Prediction:", result)

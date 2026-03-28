@@ -1,0 +1,24 @@
+import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+import pickle
+from preprocess import clean_text
+
+def train_model():
+    data = pd.read_csv("data/news.csv")
+
+    data['text'] = data['text'].apply(clean_text)
+
+    tfidf = TfidfVectorizer()
+    X = tfidf.fit_transform(data['text'])
+    y = data['label']
+
+    model = LogisticRegression()
+    model.fit(X, y)
+
+    pickle.dump((model, tfidf), open("models/model.pkl", "wb"))
+
+    print("Model trained and saved!")
+
+if __name__ == "__main__":
+    train_model()
