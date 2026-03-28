@@ -1,0 +1,77 @@
+# Install libraries (run once)
+!pip install pandas scikit-learn
+
+import string
+import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+
+# --------------------------
+# TEXT CLEANING
+# --------------------------
+def clean_text(text):
+    text = text.lower()
+    text = "".join([c for c in text if c not in string.punctuation])
+    return text
+
+# --------------------------
+# TRAIN MODEL
+# --------------------------
+def train_model():
+    data = {
+        "text": [
+            "Government passes new law",
+            "Aliens landed in Delhi yesterday",
+            "Stock market hits record high",
+            "Celebrity is a robot",
+            "New education policy announced",
+            "Time traveler spotted in Mumbai"
+        ],
+        "label": ["REAL", "FAKE", "REAL", "FAKE", "REAL", "FAKE"]
+    }
+
+    df = pd.DataFrame(data)
+    df["text"] = df["text"].apply(clean_text)
+
+    vectorizer = TfidfVectorizer()
+    X = vectorizer.fit_transform(df["text"])
+    y = df["label"]
+
+    model = LogisticRegression()
+    model.fit(X, y)
+
+    return model, vectorizer
+
+# Train model
+model, vectorizer = train_model()
+
+# --------------------------
+# PREDICT FUNCTION
+# --------------------------
+def predict_news(text):
+    cleaned = clean_text(text)
+    X = vectorizer.transform([cleaned])
+
+    prediction = model.predict(X)[0]
+    probability = model.predict_proba(X)
+    confidence = max(probability[0]) * 100
+
+    return prediction, confidence
+
+# --------------------------
+# USER INPUT LOOP
+# --------------------------
+print("📰 AI Fake News Detector (Colab Version)")
+print("----------------------------------------")
+
+while True:
+    news = input("\nEnter news text (or type 'exit'): ")
+
+    if news.lower() == "exit":
+        print("Exiting...")
+        break
+
+    result, confidence = predict_news(news)
+
+    print(f"\nPrediction: {result}")
+    print(f"Confidence: {confidence:.2f}%")
